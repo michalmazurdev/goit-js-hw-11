@@ -1,0 +1,12 @@
+.gallery {
+  padding: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.photo-card img {
+  width: calc((100vw - 68px) / 4);
+}
+.info {
+  display: flex;
+}
