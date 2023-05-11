@@ -9,4 +9,14 @@
 }
 .info {
   display: flex;
+  justify-content: space-between;
+}
+.info-item {
+  text-align: center;
+  font-size: 12px;
+}
+.load-more {
+  padding: 10px 0;
+  width: 100%;
+  margin-bottom: 15px;
 }
