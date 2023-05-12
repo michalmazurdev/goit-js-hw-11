@@ -8,11 +8,20 @@
     <script type="module" src="./index.js"></script>
   </head>
   <body>
-    <include src="./partials/form.html"></include>
+    <form class="search-form" id="search-form">
+      <input
+        type="text"
+        name="searchQuery"
+        autocomplete="off"
+        placeholder="Search images..."
+      />
+      <button type="submit">
+        <img src="./images/search_icon.svg" height="20" />
+      </button>
+    </form>
 
-    <div class="gallery">
-      <!-- Obraz karty -->
-    </div>
+    <div class="gallery"></div>
+
     <button type="button" class="load-more">Load more</button>
   </body>
 </html>

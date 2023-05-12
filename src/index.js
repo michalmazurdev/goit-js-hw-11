@@ -1,6 +1,6 @@
 import { Notify } from 'notiflix';
 import axios from 'axios';
-import simpleLightbox from 'simplelightbox';
+import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 const API_URL = 'https://pixabay.com/api/';
 const formEl = document.getElementById('search-form');
@@ -15,7 +15,7 @@ async function getPictures() {
     const response = await axios.get(API_URL, {
       params: {
         key: '36302590-ce388341fd0bce6375bf0ebc2',
-        q: encodeURIComponent(inputEl.value),
+        q: encodeURIComponent(inputEl.value.trim()),
         image_type: 'photo',
         safesearch: true,
         orientation: 'horizontal',
@@ -31,11 +31,11 @@ async function getPictures() {
 
 function renderGallery(arrayFromApi) {
   let markup = ``;
-  galleryEl.innerHTML = '';
+  //   galleryEl.innerHTML = '';
   arrayFromApi.forEach(pic => {
     markup += `
     <div class="photo-card">
-        <a><img  src="${pic.webformatURL}" alt="" loading="lazy" />
+        <a href="${pic.largeImageURL}"><img  src="${pic.webformatURL}" alt="" loading="lazy" />
         </a>
         <div class="info">
             <p class="info-item">
@@ -52,12 +52,16 @@ function renderGallery(arrayFromApi) {
             </p>
         </div>
     </div>`;
+    // galleryEl.innerHTML += markup;
+    // galleryEl.insertAdjacentHTML('beforeend', markup);
     galleryEl.innerHTML = markup;
+    let gallery = new SimpleLightbox('.gallery a');
   });
 }
 
 formEl.addEventListener('submit', async event => {
   event.preventDefault();
+  loadMoreBtnEl.style.visibility = 'hidden';
   if (inputEl.value === '') {
     return;
   }
@@ -79,7 +83,6 @@ loadMoreBtnEl.addEventListener('click', async () => {
   page += 1;
   loadMoreBtnEl.style.visibility = 'hidden';
   const picsFromApi = await getPictures(inputEl.value);
-  console.log(picsFromApi);
   renderGallery(picsFromApi.data.hits);
   if (picsFromApi.data.totalHits / page < 40) {
     loadMoreBtnEl.style.visibility = 'hidden';
