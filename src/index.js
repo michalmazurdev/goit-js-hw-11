@@ -31,7 +31,7 @@ async function getPictures() {
 
 function renderGallery(arrayFromApi) {
   let markup = ``;
-  //   galleryEl.innerHTML = '';
+  galleryEl.innerHTML = '';
   arrayFromApi.forEach(pic => {
     markup += `
     <div class="photo-card">
