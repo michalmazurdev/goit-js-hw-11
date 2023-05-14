@@ -10,12 +10,12 @@ const loadMoreBtnEl = document.querySelector('.load-more');
 loadMoreBtnEl.style.visibility = 'hidden';
 let page = 1;
 
-async function getPictures() {
+async function getPictures(searchedPhrase) {
   try {
     const response = await axios.get(API_URL, {
       params: {
         key: '36302590-ce388341fd0bce6375bf0ebc2',
-        q: encodeURIComponent(inputEl.value.trim()),
+        q: encodeURIComponent(searchedPhrase.trim()),
         image_type: 'photo',
         safesearch: true,
         orientation: 'horizontal',
@@ -31,10 +31,8 @@ async function getPictures() {
 
 function renderGallery(arrayFromApi) {
   let markup = ``;
-  galleryEl.innerHTML = '';
   arrayFromApi.forEach(pic => {
-    markup += `
-    <div class="photo-card">
+    markup += `<div class="photo-card">
         <a href="${pic.largeImageURL}"><img  src="${pic.webformatURL}" alt="" loading="lazy" />
         </a>
         <div class="info">
@@ -52,23 +50,25 @@ function renderGallery(arrayFromApi) {
             </p>
         </div>
     </div>`;
-    // galleryEl.innerHTML += markup;
-    // galleryEl.insertAdjacentHTML('beforeend', markup);
-    galleryEl.innerHTML = markup;
-    let gallery = new SimpleLightbox('.gallery a');
   });
+  galleryEl.innerHTML += markup;
+  let gallery = new SimpleLightbox('.gallery a');
 }
+function clearSearch() {
+  galleryEl.innerHTML = '';
+  localStorage.removeItem('searchedPhrase');
+}
+clearSearch();
 
 formEl.addEventListener('submit', async event => {
   event.preventDefault();
+  clearSearch();
+  localStorage.setItem('searchedPhrase', inputEl.value);
   loadMoreBtnEl.style.visibility = 'hidden';
   if (inputEl.value === '') {
     return;
   }
-  page = 1;
   const picsFromApi = await getPictures(inputEl.value);
-  console.log(picsFromApi);
-  console.log(picsFromApi.data.hits);
   if (picsFromApi.data.hits.length === 0) {
     Notify.failure(
       'Sorry, there are no images matching your search query. Please try again.'
@@ -78,15 +78,25 @@ formEl.addEventListener('submit', async event => {
   if (picsFromApi.data.totalHits > 40) {
     loadMoreBtnEl.style.visibility = 'visible';
   }
+  inputEl.value = '';
 });
+
 loadMoreBtnEl.addEventListener('click', async () => {
   page += 1;
   loadMoreBtnEl.style.visibility = 'hidden';
-  const picsFromApi = await getPictures(inputEl.value);
+  const picsFromApi = await getPictures(localStorage.getItem('searchedPhrase'));
   renderGallery(picsFromApi.data.hits);
-  if (picsFromApi.data.totalHits / page < 40) {
-    loadMoreBtnEl.style.visibility = 'hidden';
-  } else {
-    loadMoreBtnEl.style.visibility = 'visible';
-  }
+  // below code makes the page not to jump to the the bottom when loading more photos
+  const { height: cardHeight } = document
+    .querySelector('.gallery')
+    .firstElementChild.getBoundingClientRect();
+
+  window.scrollBy({
+    top: cardHeight * 2,
+    behavior: 'smooth',
+  });
+  //once there is no more photos - stop showing 'load more' button
+  picsFromApi.data.totalHits / page < 40
+    ? (loadMoreBtnEl.style.visibility = 'hidden')
+    : (loadMoreBtnEl.style.visibility = 'visible');
 });
