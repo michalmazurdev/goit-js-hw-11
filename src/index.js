@@ -73,6 +73,8 @@ formEl.addEventListener('submit', async event => {
     Notify.failure(
       'Sorry, there are no images matching your search query. Please try again.'
     );
+  } else {
+    Notify.success(`Hooray! We found ${picsFromApi.data.totalHits} images.`);
   }
   renderGallery(picsFromApi.data.hits);
   if (picsFromApi.data.totalHits > 40) {
